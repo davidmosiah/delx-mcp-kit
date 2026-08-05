@@ -19,3 +19,4 @@ export {
   type ErrorCode,
 } from "./errors.js";
 export { TokenStore } from "./token-store.js";
+export * from "./series.js";

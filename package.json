@@ -1,6 +1,6 @@
 {
   "name": "delx-mcp-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared SOTA primitives for Delx local-first MCP servers: privacy escalation, GPS redaction, token store, annotations, agent error codes.",
   "type": "module",
   "main": "dist/index.js",
@@ -20,6 +20,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test:series-types": "npm run build && node scripts/series-types-test.mjs",
     "test": "npm run typecheck && npm run build && node scripts/test-kit.mjs",
     "prepublishOnly": "npm test"
   },
