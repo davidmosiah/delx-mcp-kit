@@ -1,7 +1,7 @@
 {
   "name": "delx-mcp-kit",
-  "version": "0.1.1",
-  "description": "Shared SOTA primitives for Delx local-first MCP servers: privacy escalation, GPS redaction, token store, annotations, agent error codes.",
+  "version": "0.2.0",
+  "description": "Shared primitives for Delx local-first MCP servers: privacy escalation, GPS redaction, token store, annotations, agent error codes, agent-safe-series/v1.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,7 +15,8 @@
     "dist",
     "README.md",
     "LICENSE",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "SECURITY.md"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -32,13 +33,19 @@
     "privacy",
     "agent",
     "delx",
-    "wellness"
+    "wellness",
+    "agent-safe-series"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davidmosiah/delx-mcp-kit.git"
   },
+  "bugs": {
+    "url": "https://github.com/davidmosiah/delx-mcp-kit/issues",
+    "email": "support@delx.ai"
+  },
+  "homepage": "https://github.com/davidmosiah/delx-mcp-kit#readme",
   "publishConfig": {
     "access": "public"
   },

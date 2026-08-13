@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, readFileSync, existsSync } from "node:fs";
+import { mkdtempSync, rmSync, existsSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -10,6 +10,9 @@ import {
   userActionRequired,
   ERROR_CODES,
   readOnlyAnnotation,
+  mutationAnnotation,
+  clampMaxPoints,
+  SERIES_HARD_MAX_POINTS,
 } from "../dist/index.js";
 
 // privacy escalation
@@ -19,11 +22,21 @@ try {
 } catch (e) {
   assert.match(String(e.message || e), /USER_ACTION_REQUIRED/);
 }
+try {
+  resolvePrivacyMode({ privacyMode: "structured" }, undefined, {
+    include_gps: true,
+    explicit_user_intent: false,
+  });
+  assert.fail("should throw");
+} catch (e) {
+  assert.match(String(e.message || e), /USER_ACTION_REQUIRED/);
+}
 assert.equal(
   resolvePrivacyMode({ privacyMode: "structured" }, "raw", { explicit_user_intent: true }),
   "raw",
 );
 assert.equal(resolvePrivacyMode({ privacyMode: "raw" }), "raw");
+assert.equal(clampMaxPoints(10_000), SERIES_HARD_MAX_POINTS);
 
 // GPS deep strip
 const nested = stripGpsDeep({
@@ -42,6 +55,7 @@ const path = join(dir, "tokens.json");
 const store = new TokenStore(path);
 await store.write({ access_token: "t" });
 assert.equal(existsSync(path), true);
+assert.equal(statSync(path).mode & 0o777, 0o600);
 const read = await store.read();
 assert.equal(read.access_token, "t");
 await store.clear();
@@ -52,5 +66,7 @@ rmSync(dir, { recursive: true, force: true });
 assert.match(userActionRequired("confirm first").message, /USER_ACTION_REQUIRED/);
 assert.equal(ERROR_CODES.AUTH_REQUIRED, "AUTH_REQUIRED");
 assert.equal(readOnlyAnnotation().readOnlyHint, true);
+assert.equal(mutationAnnotation().readOnlyHint, false);
+assert.equal(mutationAnnotation({ destructive: true }).destructiveHint, true);
 
 console.log(JSON.stringify({ ok: true, suite: "delx-mcp-kit" }, null, 2));
