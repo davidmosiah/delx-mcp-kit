@@ -22,8 +22,9 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test:series-types": "npm run build && node scripts/series-types-test.mjs",
-    "test": "npm run typecheck && npm run build && node scripts/test-kit.mjs && node scripts/series-types-test.mjs",
-    "prepublishOnly": "npm test"
+    "test": "npm run typecheck && npm run build && node scripts/test-kit.mjs && node scripts/series-types-test.mjs && npm run test:token-atomic",
+    "prepublishOnly": "npm test",
+    "test:token-atomic": "node scripts/test-token-atomic.mjs"
   },
   "engines": {
     "node": ">=20"

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { constants, promises as fs } from "node:fs";
 import { dirname } from "node:path";
 
@@ -28,10 +29,20 @@ export class TokenStore<T = unknown> {
 
   async write(tokens: T): Promise<void> {
     await fs.mkdir(dirname(this.tokenPath), { recursive: true, mode: 0o700 });
-    const tmp = `${this.tokenPath}.tmp-${process.pid}`;
-    await fs.writeFile(tmp, JSON.stringify(tokens, null, 2), { mode: 0o600 });
-    await fs.rename(tmp, this.tokenPath);
-    await fs.chmod(this.tokenPath, 0o600).catch(() => undefined);
+    const tmp = `${this.tokenPath}.tmp-${process.pid}-${randomUUID()}`;
+    // Exclusive unique files keep simultaneous writers isolated and never follow
+    // a pre-existing temporary-file symlink. Rename publishes a complete 0600 file.
+    const handle = await fs.open(tmp, "wx", 0o600);
+    try {
+      await handle.writeFile(JSON.stringify(tokens, null, 2));
+      await handle.close();
+      await fs.rename(tmp, this.tokenPath);
+    } finally {
+      await handle.close().catch(() => undefined);
+      await fs.unlink(tmp).catch((error: NodeJS.ErrnoException) => {
+        if (error.code !== "ENOENT") throw error;
+      });
+    }
   }
 
   async clear(): Promise<void> {
