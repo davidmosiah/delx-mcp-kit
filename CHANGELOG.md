@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Isolate concurrent token writes with exclusive random temporary files, restrictive permissions, and failure cleanup.
+
+
 ## 0.2.0 - 2026-08-13
 
 ### Added
