@@ -23,7 +23,8 @@ export class TokenStore<T = unknown> {
       return JSON.parse(text) as T;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
-      throw error;
+      if (error instanceof SyntaxError) throw new Error("Stored token file contains invalid JSON");
+      throw new Error("Unable to read stored token file");
     }
   }
 

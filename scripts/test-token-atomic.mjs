@@ -22,6 +22,13 @@ try {
   await store.write(values[0]);
   assert.equal(await fs.readFile(target, "utf8"), "unchanged");
   assert.equal((await fs.lstat(legacy)).isSymbolicLink(), true);
+  await fs.writeFile(path, "synthetic-sensitive-token-not-json");
+  await assert.rejects(() => store.read(), error => {
+    assert.equal(error.message, "Stored token file contains invalid JSON");
+    assert.doesNotMatch(error.message, /synthetic-sensitive|synthetic-/);
+    return true;
+  });
+  assert.equal(await fs.readFile(path, "utf8"), "synthetic-sensitive-token-not-json");
   // A failed rename must clean up its own temporary file.
   const blocked = join(dir, "directory");
   await fs.mkdir(blocked);
